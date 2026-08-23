@@ -1,6 +1,5 @@
 import { Car } from './car.js';
-import { extendTrack } from './track.js';
-import { generateChunk, placeCoins } from './data/endless.js';
+import { placeCoins } from './data/endless.js';
 import { CARS, getCar } from './data/cars.js';
 import { TRACKS, getTrack } from './data/tracks.js';
 import { UPGRADE_STATS, MAX_LEVEL, costForNextLevel, applyUpgrades } from './data/upgrades.js';
@@ -9,7 +8,6 @@ import { Input } from './input.js';
 import { Camera, drawBackground, drawTrack, drawCar, drawCoins, Particles } from './render.js';
 
 const PX_PER_METER = 15;
-const EXTEND_MARGIN = 1600;
 const FALL_MARGIN = 500;
 const COIN_RADIUS = 30;
 
@@ -349,25 +347,11 @@ function stepRace(dt) {
       showToast('🏆 New personal best!');
     }
 
-    if (raceCar.progressX > raceTrack.finishX - EXTEND_MARGIN) {
-      extendRaceTrack();
-    }
-
     if (raceCar.pos.y > raceTrack.bounds.maxY + FALL_MARGIN) {
       endRun();
       return;
     }
   }
-}
-
-function extendRaceTrack() {
-  const fromChain = raceTrack.chains.length - 1;
-  const fromArc = raceTrack.chains[fromChain][raceTrack.chains[fromChain].length - 1].arc;
-  const chunk = generateChunk(raceTrack.endlessSurface, raceTrack.finishX, raceTrack.chunkWeights);
-  const extended = extendTrack(raceTrack, chunk);
-  const newCoins = placeCoins(extended, fromChain, fromArc);
-  raceTrack = extended;
-  raceCoins.push(...newCoins);
 }
 
 function collectCoins() {
