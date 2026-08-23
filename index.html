@@ -59,7 +59,11 @@
     <!-- RACE HUD -->
     <div id="hud" class="hidden">
       <div class="hud-top">
-        <div class="hud-timer" id="hud-timer">0.00</div>
+        <div class="hud-distance-wrap">
+          <div class="hud-distance" id="hud-distance">0m</div>
+          <div class="hud-pb" id="hud-pb">PB 0m</div>
+        </div>
+        <div class="hud-coins" id="hud-coins">🪙 0</div>
         <button class="hud-pause" id="btn-pause">⏸</button>
       </div>
       <div class="hud-toast" id="hud-toast"></div>
@@ -85,12 +89,13 @@
     <!-- RESULTS -->
     <section id="screen-results" class="screen hidden overlay-screen">
       <div class="panel">
-        <h2 id="results-title">Finished!</h2>
-        <div class="results-time" id="results-time">0.00s</div>
-        <div class="results-stars" id="results-stars">☆☆☆</div>
+        <h2 id="results-title">Run Over!</h2>
+        <div class="results-time" id="results-distance">0m</div>
+        <div class="results-pb" id="results-pb">Best: 0m</div>
         <div class="results-coins" id="results-coins">+0 🪙</div>
+        <div class="results-unlock hidden" id="results-unlock">🔓 New track unlocked!</div>
         <button class="btn btn-primary" id="btn-retry">↻ Retry</button>
-        <button class="btn" id="btn-next-track">Next Track →</button>
+        <button class="btn" id="btn-change-track">🏁 Change Track</button>
         <button class="btn" id="btn-results-menu">☰ Menu</button>
       </div>
     </section>

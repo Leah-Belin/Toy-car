@@ -140,6 +140,10 @@ export function buildTrack(startX, startY, segments, stepSize = 10) {
     boostZones,
     decals,
     loopRegions,
+    // Stashed so extendTrack() can rebuild from the full segment history
+    // (including everything procedurally appended so far) in one shot.
+    segmentList: segments,
+    stepSize,
     startX,
     startY,
     finishX: cx,
@@ -269,6 +273,17 @@ export function castRay(track, origin, dir, maxDist) {
     }
   }
   return best;
+}
+
+// Append more segments to a track and rebuild. Because we always rebuild
+// from the full segment history (not an incremental patch), the regenerated
+// chains up to the old end are byte-for-byte the same shape as before --
+// just a new array -- so a car's existing {chainIndex, s} stays valid
+// across the swap; the caller just needs to start using the returned
+// object.
+export function extendTrack(track, newSegments) {
+  const fullSegments = [...track.segmentList, ...newSegments];
+  return buildTrack(track.startX, track.startY, fullSegments, track.stepSize);
 }
 
 // Nearest checkpoint at or before the given progress (max x reached).

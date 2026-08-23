@@ -292,15 +292,34 @@ html, body {
   pointer-events: auto;
 }
 
-.hud-timer {
+.hud-distance-wrap {
   background: rgba(255, 255, 255, 0.92);
   border: 4px solid var(--ink);
   border-radius: 14px;
-  padding: 8px 18px;
-  font-size: 1.6rem;
-  font-weight: 800;
-  min-width: 110px;
+  padding: 6px 18px;
+  min-width: 120px;
   text-align: center;
+}
+
+.hud-distance {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.hud-pb {
+  font-size: 0.7rem;
+  font-weight: 700;
+  opacity: 0.65;
+}
+
+.hud-coins {
+  background: rgba(255, 255, 255, 0.92);
+  border: 4px solid var(--ink);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 1.1rem;
+  font-weight: 800;
 }
 
 .hud-pause {
@@ -392,17 +411,85 @@ html, body {
   font-weight: 800;
 }
 
-.results-stars {
+.results-pb {
   text-align: center;
-  font-size: 2rem;
-  color: var(--sunny);
-  -webkit-text-stroke: 1.5px var(--ink);
+  font-weight: 700;
+  opacity: 0.75;
+  margin-top: -8px;
 }
 
 .results-coins {
   text-align: center;
   font-weight: 700;
   margin-bottom: 6px;
+}
+
+.results-unlock {
+  text-align: center;
+  font-weight: 800;
+  color: #2fae6a;
+  margin-bottom: 4px;
+}
+
+/* --- Garage upgrade rows --- */
+
+.upgrade-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.upgrade-label {
+  width: 56px;
+  flex-shrink: 0;
+}
+
+.upgrade-dots {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+}
+
+.upgrade-dot {
+  flex: 1;
+  height: 9px;
+  border-radius: 3px;
+  background: #eee;
+  border: 1px solid rgba(43, 35, 64, 0.3);
+}
+
+.upgrade-dot.filled {
+  background: var(--sky);
+}
+
+.upgrade-buy {
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.68rem;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--sunny);
+  padding: 3px 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.upgrade-buy:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.category-badge {
+  display: inline-block;
+  align-self: flex-start;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
 }
 
 @media (max-width: 480px) {

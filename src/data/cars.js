@@ -16,6 +16,7 @@ const base = {
 export const CARS = [
   {
     id: 'red-racer',
+    category: 'Street',
     name: 'Red Racer',
     tagline: 'Balanced starter car. Good at a bit of everything.',
     color: '#e8433a',
@@ -37,6 +38,7 @@ export const CARS = [
   },
   {
     id: 'dune-digger',
+    category: 'Off-Road',
     name: 'Dune Digger',
     tagline: 'Chunky off-road tires. King of dirt and grass.',
     color: '#c67a2e',
@@ -58,6 +60,7 @@ export const CARS = [
   },
   {
     id: 'ice-fang',
+    category: 'Off-Road',
     name: 'Ice Fang',
     tagline: 'Studded tires bite into snow and ice.',
     color: '#3fb6e8',
@@ -79,6 +82,7 @@ export const CARS = [
   },
   {
     id: 'muscle-bomber',
+    category: 'Muscle',
     name: 'Muscle Bomber',
     tagline: 'Huge engine, huge weight. Owns the asphalt straights.',
     color: '#7b2fd6',
@@ -100,6 +104,7 @@ export const CARS = [
   },
   {
     id: 'sky-jumper',
+    category: 'Stunt',
     name: 'Sky Jumper',
     tagline: 'Featherweight with sponge-soft suspension. Built to fly.',
     color: '#f2c230',
@@ -121,6 +126,7 @@ export const CARS = [
   },
   {
     id: 'loop-king',
+    category: 'Stunt',
     name: 'Loop King',
     tagline: 'Low center of gravity and rock-steady in loops.',
     color: '#2fae6a',
@@ -142,6 +148,7 @@ export const CARS = [
   },
   {
     id: 'grass-hopper',
+    category: 'Off-Road',
     name: 'Grass Hopper',
     tagline: 'Light and grippy across rolling hills.',
     color: '#7fd13f',
@@ -163,6 +170,7 @@ export const CARS = [
   },
   {
     id: 'golden-turbo',
+    category: 'Muscle',
     name: 'Golden Turbo',
     tagline: 'The legend. Best-in-class everywhere. Earn it.',
     color: '#f7d449',
