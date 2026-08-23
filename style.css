@@ -1,0 +1,413 @@
+* { box-sizing: border-box; }
+
+:root {
+  --sunny: #ffd23f;
+  --coral: #ff5d5d;
+  --sky: #4ec8f2;
+  --grass: #4fbf6b;
+  --ink: #2b2340;
+  --cream: #fff6e3;
+  --panel-shadow: 0 10px 0 rgba(43, 35, 64, 0.35);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #16121f;
+  font-family: 'Baloo 2', 'Comic Sans MS', system-ui, sans-serif;
+  color: var(--ink);
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
+}
+
+#game {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#ui {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* --- Panels & buttons --- */
+
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.overlay-screen {
+  background: rgba(20, 15, 35, 0.55);
+}
+
+.panel {
+  background: var(--cream);
+  border: 5px solid var(--ink);
+  border-radius: 28px;
+  box-shadow: var(--panel-shadow);
+  padding: 28px 34px;
+  max-width: min(92vw, 480px);
+  max-height: 88vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.wide-panel {
+  max-width: min(94vw, 900px);
+  width: 900px;
+}
+
+.panel h1, .panel h2 {
+  margin: 0 0 4px;
+  text-align: center;
+  color: var(--ink);
+  text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.4);
+}
+
+.title {
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 800;
+  color: var(--coral);
+  -webkit-text-stroke: 2px var(--ink);
+}
+
+.subtitle {
+  text-align: center;
+  margin: 0 0 8px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.btn {
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: #fff;
+  border: 4px solid var(--ink);
+  border-radius: 16px;
+  padding: 14px 22px;
+  cursor: pointer;
+  box-shadow: 0 6px 0 rgba(43, 35, 64, 0.5);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgba(43, 35, 64, 0.5);
+}
+
+.btn-primary {
+  background: var(--sunny);
+}
+
+.btn-link {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  opacity: 0.7;
+  padding: 6px 10px;
+}
+
+.btn-link:active {
+  transform: none;
+}
+
+.menu-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.coin-badge {
+  background: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-weight: 700;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.panel-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.selected-car-chip {
+  background: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* --- Card grids (garage / track select) --- */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.card {
+  background: #fff;
+  border: 4px solid var(--ink);
+  border-radius: 18px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 5px 0 rgba(43, 35, 64, 0.35);
+  transition: transform 0.08s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.card.selected {
+  outline: 4px solid var(--sunny);
+  outline-offset: -2px;
+}
+
+.card.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.card-swatch {
+  height: 54px;
+  border-radius: 12px;
+  border: 3px solid var(--ink);
+}
+
+.card-name {
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.card-tagline {
+  font-size: 0.78rem;
+  opacity: 0.75;
+  min-height: 2.2em;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.stat-bar {
+  flex: 1;
+  height: 8px;
+  background: #eee;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(43, 35, 64, 0.3);
+}
+
+.stat-fill {
+  height: 100%;
+  background: var(--coral);
+}
+
+.card-price {
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+.track-stars {
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+}
+
+.track-best {
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
+
+.diff-dots span {
+  opacity: 0.25;
+}
+
+.diff-dots span.on {
+  opacity: 1;
+}
+
+/* --- HUD --- */
+
+#hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hud-top {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.hud-timer {
+  background: rgba(255, 255, 255, 0.92);
+  border: 4px solid var(--ink);
+  border-radius: 14px;
+  padding: 8px 18px;
+  font-size: 1.6rem;
+  font-weight: 800;
+  min-width: 110px;
+  text-align: center;
+}
+
+.hud-pause {
+  background: rgba(255, 255, 255, 0.92);
+  border: 4px solid var(--ink);
+  border-radius: 50%;
+  width: 46px;
+  height: 46px;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.hud-toast {
+  position: absolute;
+  top: 74px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(43, 35, 64, 0.85);
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.hud-toast.show {
+  opacity: 1;
+}
+
+/* --- Touch controls --- */
+
+#touch-controls {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  display: none;
+}
+
+@media (pointer: coarse) {
+  #touch-controls.armed {
+    display: block;
+  }
+}
+
+.touch-btn {
+  position: absolute;
+  bottom: 22px;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 4px solid var(--ink);
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 1.8rem;
+  pointer-events: auto;
+  box-shadow: 0 5px 0 rgba(43, 35, 64, 0.4);
+}
+
+.touch-gas {
+  right: 22px;
+  background: rgba(79, 191, 107, 0.85);
+}
+
+.touch-brake {
+  right: 108px;
+  background: rgba(255, 93, 93, 0.85);
+}
+
+.touch-tilt {
+  left: 22px;
+  width: 62px;
+  height: 62px;
+  font-size: 1.4rem;
+}
+
+.touch-tilt-up {
+  bottom: 96px;
+}
+
+.touch-tilt-down {
+  bottom: 22px;
+}
+
+/* --- Results --- */
+
+.results-time {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.results-stars {
+  text-align: center;
+  font-size: 2rem;
+  color: var(--sunny);
+  -webkit-text-stroke: 1.5px var(--ink);
+}
+
+.results-coins {
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 480px) {
+  .panel {
+    padding: 20px 18px;
+    border-radius: 20px;
+  }
+}
