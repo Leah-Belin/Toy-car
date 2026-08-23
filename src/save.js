@@ -1,12 +1,14 @@
-const KEY = 'toycar-save-v1';
+const KEY = 'toycar-save-v2';
 
 function defaults() {
   return {
     coins: 0,
     unlockedCars: ['red-racer'],
     selectedCar: 'red-racer',
-    // trackId -> { bestTime, stars }
+    // trackId -> { bestMeters }
     trackProgress: {},
+    // carId -> { speed, grip, handling } upgrade levels (0-5 each)
+    carUpgrades: {},
     muted: false,
   };
 }
@@ -57,15 +59,27 @@ export const Save = {
     state.selectedCar = id;
     persist();
   },
-  recordResult(trackId, timeSeconds, stars) {
+  // Returns true if this run set a new personal best.
+  recordDistance(trackId, meters) {
     const prev = state.trackProgress[trackId];
-    const best = prev && prev.bestTime < timeSeconds ? prev.bestTime : timeSeconds;
-    const bestStars = prev ? Math.max(prev.stars, stars) : stars;
-    state.trackProgress[trackId] = { bestTime: best, stars: bestStars };
+    const isNewBest = !prev || meters > prev.bestMeters;
+    state.trackProgress[trackId] = { bestMeters: isNewBest ? meters : prev.bestMeters };
     persist();
+    return isNewBest;
   },
   progressFor(trackId) {
     return state.trackProgress[trackId] || null;
+  },
+  upgradesFor(carId) {
+    return state.carUpgrades[carId] || { speed: 0, grip: 0, handling: 0 };
+  },
+  upgradeLevel(carId, stat) {
+    return (state.carUpgrades[carId] && state.carUpgrades[carId][stat]) || 0;
+  },
+  bumpUpgrade(carId, stat) {
+    if (!state.carUpgrades[carId]) state.carUpgrades[carId] = { speed: 0, grip: 0, handling: 0 };
+    state.carUpgrades[carId][stat] = (state.carUpgrades[carId][stat] || 0) + 1;
+    persist();
   },
   setMuted(m) {
     state.muted = m;

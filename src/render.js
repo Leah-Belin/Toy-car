@@ -24,22 +24,26 @@ export class Camera {
   }
 }
 
+// Asphalt is drawn as molded orange/red Hot Wheels plastic track (seam
+// ticks + blue support pylons); dirt/grass/ice stay natural off-road
+// terrain colors, which is what actually carries the "grip differs by
+// surface" gameplay signal.
 const SURFACE_COLORS = {
-  asphalt: { top: '#4a4f5c', body: '#33363f', line: '#e8e8e8' },
+  asphalt: { top: '#ff7a1a', body: '#c2440d', line: '#7a2600' },
   dirt: { top: '#a9713c', body: '#7a4f28', line: '#5c3a1c' },
   grass: { top: '#5cb84f', body: '#3d8a34', line: '#2c6425' },
   ice: { top: '#bfe9f7', body: '#8fc9e0', line: '#ffffff' },
-  boost: { top: '#ff9d33', body: '#d9711a', line: '#ffe08a' },
+  boost: { top: '#8be84a', body: '#4f9e2a', line: '#e8ffb0' },
 };
 
 const THEMES = {
-  day: { sky: ['#7ec8f2', '#cdeeff'], hills: ['#8fd9a8', '#6bc48c'] },
+  day: { sky: ['#7ec8f2', '#cdeeff'], hills: ['#8fd9a8', '#6bc48c'], city: true },
   desert: { sky: ['#f3c66b', '#ffe3a3'], hills: ['#d99a53', '#c07f3c'] },
   meadow: { sky: ['#a9e3c4', '#eafff0'], hills: ['#6fbf6f', '#4f9e51'] },
-  carnival: { sky: ['#f79fd0', '#ffe1f2'], hills: ['#f5c04a', '#e89b3c'] },
+  carnival: { sky: ['#f79fd0', '#ffe1f2'], hills: ['#f5c04a', '#e89b3c'], city: true },
   canyon: { sky: ['#f0955a', '#ffd9a8'], hills: ['#b5583a', '#8e3f28'] },
   snow: { sky: ['#cfe6f7', '#f2fbff'], hills: ['#e8f4fb', '#c9e4f2'] },
-  volcano: { sky: ['#3a2233', '#7a3049'], hills: ['#4a1f2a', '#2c1119'] },
+  volcano: { sky: ['#3a2233', '#7a3049'], hills: ['#4a1f2a', '#2c1119'], city: true },
 };
 
 export function drawBackground(ctx, camera, canvasW, canvasH, theme) {
@@ -49,6 +53,8 @@ export function drawBackground(ctx, camera, canvasW, canvasH, theme) {
   sky.addColorStop(1, t.sky[1]);
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, canvasW, canvasH);
+
+  if (t.city) drawSkyline(ctx, camera, canvasW, canvasH);
 
   for (let layer = 0; layer < 2; layer++) {
     const parallax = layer === 0 ? 0.15 : 0.3;
@@ -70,7 +76,34 @@ export function drawBackground(ctx, camera, canvasW, canvasH, theme) {
   }
 }
 
+// A distant, deterministic city skyline (buildings sized/spaced from their
+// world x so it doesn't shimmer as the camera scrolls).
+function drawSkyline(ctx, camera, canvasW, canvasH) {
+  const parallax = 0.06;
+  const offset = -camera.x * parallax;
+  const baseY = canvasH * 0.58;
+  const spacing = 90;
+  const firstIndex = Math.floor((-offset) / spacing) - 1;
+  const lastWorldX = canvasW - offset;
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  for (let i = firstIndex; offset + i * spacing <= lastWorldX + spacing; i++) {
+    const seed = Math.abs(Math.sin(i * 12.9898) * 43758.5453) % 1;
+    const h = 60 + seed * 150;
+    const w = spacing * 0.55;
+    const x = offset + i * spacing;
+    ctx.fillRect(x, baseY - h, w, h + canvasH);
+    // A few lit windows for texture.
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    for (let wy = baseY - h + 12; wy < baseY - 10; wy += 18) {
+      ctx.fillRect(x + w * 0.2, wy, 4, 4);
+      ctx.fillRect(x + w * 0.6, wy, 4, 4);
+    }
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  }
+}
+
 const GROUND_THICKNESS = 46;
+const PYLON_SPACING = 320;
 
 export function drawTrack(ctx, camera, canvasW, canvasH, track) {
   for (const chain of track.chains) {
@@ -93,15 +126,17 @@ export function drawTrack(ctx, camera, canvasW, canvasH, track) {
     ctx.fillStyle = '#5c4632';
     ctx.fill();
 
-    // Surface-colored top stroke, drawn per same-surface run for the
-    // road's driving line (dashed center line for asphalt/boost).
+    drawPylons(ctx, camera, canvasW, canvasH, chain);
+
+    // Surface-colored top stroke, drawn per same-surface run.
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     let runStart = 0;
     for (let i = 1; i <= chain.length; i++) {
       const changed = i === chain.length || chain[i].surface !== chain[runStart].surface;
       if (!changed) continue;
-      const colors = SURFACE_COLORS[chain[runStart].surface] || SURFACE_COLORS.asphalt;
+      const surface = chain[runStart].surface;
+      const colors = SURFACE_COLORS[surface] || SURFACE_COLORS.asphalt;
       ctx.beginPath();
       for (let j = runStart; j < i; j++) {
         const p = camera.worldToScreen(chain[j], canvasW, canvasH);
@@ -111,13 +146,70 @@ export function drawTrack(ctx, camera, canvasW, canvasH, track) {
       ctx.strokeStyle = colors.top;
       ctx.lineWidth = 14;
       ctx.stroke();
-      ctx.strokeStyle = colors.line;
-      ctx.lineWidth = 3;
-      ctx.setLineDash(chain[runStart].surface === 'grass' || chain[runStart].surface === 'ice' ? [] : [16, 14]);
-      ctx.stroke();
-      ctx.setLineDash([]);
+
+      if (surface === 'asphalt' || surface === 'boost') {
+        drawSeamTicks(ctx, camera, canvasW, canvasH, chain, runStart, i, colors.line);
+      } else {
+        ctx.beginPath();
+        for (let j = runStart; j < i; j++) {
+          const p = camera.worldToScreen(chain[j], canvasW, canvasH);
+          if (j === runStart) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+        ctx.strokeStyle = colors.line;
+        ctx.lineWidth = 3;
+        ctx.setLineDash([16, 14]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
       runStart = i;
     }
+  }
+}
+
+// Molded-plastic-track look: short perpendicular ticks where track segments
+// would snap together, instead of a painted road stripe.
+function drawSeamTicks(ctx, camera, canvasW, canvasH, chain, from, to, color) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.5;
+  const step = 34;
+  let sinceLast = 0;
+  for (let i = from; i < to; i++) {
+    sinceLast += i > from ? Math.hypot(chain[i].x - chain[i - 1].x, chain[i].y - chain[i - 1].y) : 0;
+    if (sinceLast < step) continue;
+    sinceLast = 0;
+    const tangent = chainTangent(chain, i);
+    const n = perp(tangent);
+    const a = camera.worldToScreen({ x: chain[i].x - n.x * 6, y: chain[i].y - n.y * 6 }, canvasW, canvasH);
+    const b = camera.worldToScreen({ x: chain[i].x + n.x * 6, y: chain[i].y + n.y * 6 }, canvasW, canvasH);
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  }
+}
+
+// Blue support struts under asphalt sections, like the elevated orange
+// track's stands.
+function drawPylons(ctx, camera, canvasW, canvasH, chain) {
+  ctx.strokeStyle = '#2f6fb0';
+  ctx.lineWidth = 10;
+  ctx.lineCap = 'round';
+  let sinceLast = 0;
+  for (let i = 1; i < chain.length; i++) {
+    sinceLast += Math.hypot(chain[i].x - chain[i - 1].x, chain[i].y - chain[i - 1].y);
+    if (sinceLast < PYLON_SPACING || chain[i].surface !== 'asphalt') continue;
+    sinceLast = 0;
+    const tangent = chainTangent(chain, i);
+    const n = perp(tangent);
+    const topPt = { x: chain[i].x + n.x * GROUND_THICKNESS, y: chain[i].y + n.y * GROUND_THICKNESS };
+    const botPt = { x: topPt.x + n.x * 160, y: topPt.y + n.y * 160 };
+    const a = camera.worldToScreen(topPt, canvasW, canvasH);
+    const b = camera.worldToScreen(botPt, canvasW, canvasH);
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
   }
 }
 
@@ -128,6 +220,30 @@ function chainTangent(chain, i) {
   const dy = b.y - a.y;
   const len = Math.hypot(dx, dy) || 1;
   return { x: dx / len, y: dy / len };
+}
+
+// ---------------------------------------------------------------------------
+// Coins: small spinning discs collected for the persistent wallet.
+// ---------------------------------------------------------------------------
+export function drawCoins(ctx, camera, canvasW, canvasH, coins) {
+  const t = performance.now() / 1000;
+  for (const coin of coins) {
+    if (coin.taken) continue;
+    const screen = camera.worldToScreen(coin, canvasW, canvasH);
+    if (screen.x < -30 || screen.x > canvasW + 30) continue;
+    const squash = Math.abs(Math.cos(t * 3 + coin.x * 0.01));
+    ctx.save();
+    ctx.translate(screen.x, screen.y);
+    ctx.scale(0.4 + squash * 0.6, 1);
+    ctx.beginPath();
+    ctx.arc(0, 0, 11, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffd23f';
+    ctx.fill();
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = '#a3790a';
+    ctx.stroke();
+    ctx.restore();
+  }
 }
 
 // ---------------------------------------------------------------------------

@@ -14,7 +14,12 @@ function makeTrack(opts) {
     tagline: opts.tagline,
     theme: opts.theme,
     difficulty: opts.difficulty,
-    parTimes: opts.parTimes,
+    // Endless-mode continuation: which surface procedural chunks use past
+    // the hand-authored intro, how much to favor each hazard kind, and how
+    // far (in meters) you need to get to unlock the next track.
+    endlessSurface: opts.endlessSurface || opts.startSurface || 'asphalt',
+    chunkWeights: opts.chunkWeights || {},
+    milestoneMeters: opts.milestoneMeters,
     unlockRequires: opts.unlockRequires || null,
     ...built,
   };
@@ -38,7 +43,9 @@ export const TRACKS = [
       { type: 'bumps', length: 260, amplitude: 7, frequency: 3, surface: 'asphalt' },
       { type: 'flat', length: 500, surface: 'asphalt' },
     ],
-    parTimes: { gold: 12.5, silver: 15.5, bronze: 20 },
+    endlessSurface: 'asphalt',
+    chunkWeights: { loop: 0.3 },
+    milestoneMeters: 120,
   }),
 
   makeTrack({
@@ -62,7 +69,9 @@ export const TRACKS = [
       { type: 'checkpoint' },
       { type: 'flat', length: 400, surface: 'dirt' },
     ],
-    parTimes: { gold: 16, silver: 20, bronze: 26 },
+    endlessSurface: 'dirt',
+    chunkWeights: { bumps: 1.6 },
+    milestoneMeters: 160,
     unlockRequires: 'sunny-straightaway',
   }),
 
@@ -90,7 +99,9 @@ export const TRACKS = [
       { type: 'bumps', length: 300, amplitude: 10, frequency: 3, surface: 'grass' },
       { type: 'flat', length: 400, surface: 'grass' },
     ],
-    parTimes: { gold: 17, silver: 21, bronze: 27 },
+    endlessSurface: 'grass',
+    chunkWeights: { hills: 1.6 },
+    milestoneMeters: 180,
     unlockRequires: 'dirt-dash',
   }),
 
@@ -114,7 +125,9 @@ export const TRACKS = [
       { type: 'bumps', length: 260, amplitude: 9, frequency: 4, surface: 'asphalt' },
       { type: 'flat', length: 300, surface: 'asphalt' },
     ],
-    parTimes: { gold: 15.5, silver: 19, bronze: 24 },
+    endlessSurface: 'asphalt',
+    chunkWeights: { loop: 2.2, gap: 1.2 },
+    milestoneMeters: 150,
     unlockRequires: 'grass-hills',
   }),
 
@@ -138,7 +151,9 @@ export const TRACKS = [
       { type: 'gap', length: 75 },
       { type: 'flat', length: 400, surface: 'asphalt' },
     ],
-    parTimes: { gold: 15, silver: 19, bronze: 25 },
+    endlessSurface: 'asphalt',
+    chunkWeights: { gap: 2.2, loop: 0.6 },
+    milestoneMeters: 150,
     unlockRequires: 'loop-de-loop',
   }),
 
@@ -163,7 +178,9 @@ export const TRACKS = [
       { type: 'hill', length: 220, height: -45, surface: 'ice' },
       { type: 'flat', length: 400, surface: 'ice' },
     ],
-    parTimes: { gold: 16.5, silver: 21, bronze: 27 },
+    endlessSurface: 'ice',
+    chunkWeights: { bumps: 1.5, loop: 0.4 },
+    milestoneMeters: 170,
     unlockRequires: 'canyon-gap',
   }),
 
@@ -193,7 +210,9 @@ export const TRACKS = [
       { type: 'bumps', length: 300, amplitude: 16, frequency: 5, surface: 'dirt' },
       { type: 'flat', length: 400, surface: 'asphalt' },
     ],
-    parTimes: { gold: 19, silver: 24, bronze: 31 },
+    endlessSurface: 'dirt',
+    chunkWeights: { loop: 1.8, gap: 1.8, bumps: 1.3 },
+    milestoneMeters: 200,
     unlockRequires: 'ice-peak',
   }),
 ];
